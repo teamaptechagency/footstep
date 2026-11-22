@@ -1,0 +1,7 @@
+import Link from 'next/link';
+import {api,Collection,Deal,image} from '@/lib/catalog';
+import Media from '@/components/Media';
+import {dealHref} from '@/lib/design';
+import {pageSeo} from '@/lib/seo';
+export const metadata=pageSeo('Flash Deals & Shoe Collections','Explore active shoe collections and current offers at Footstep Online Bangladesh.','/flash-deals');
+export default async function Deals(){const deals=await api<Collection<Deal>>('flash-deals',true);return <section className="fd-groups"><div className="container"><header className="fd-groups-head"><div><Link className="fd-home" href="/">Home <span>/</span> Offers</Link><h1>Flash Deals<span>Find your next pair.</span></h1><p>একটি collection বেছে নিন, তারপর সেই group-এর সব product দেখুন।</p></div><span className="fd-count">{deals.data.length} active collections</span></header><div className="fd-groups-grid">{deals.data.map((d,i)=><Link href={dealHref(d.id,d.slug)} key={d.id} className="fd-group-card" prefetch={false}><div className="fd-group-image"><Media src={image(d.banner)} alt={d.title}/><span className="fd-group-badge">COLLECTION {String(i+1).padStart(2,'0')}</span></div><div className="fd-group-body"><div className="fd-group-title"><h2>{d.title}</h2></div><div className="fd-group-bottom"><span className="fd-group-open">View collection <span>↗</span></span></div></div></Link>)}</div>{!deals.data.length&&<div className="fd-group-empty">এই মুহূর্তে কোনো active deal নেই।</div>}</div></section>;}

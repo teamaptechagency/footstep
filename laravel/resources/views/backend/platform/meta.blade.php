@@ -1,0 +1,37 @@
+@extends('backend.layouts.app')
+@section('content')
+<div class="alert {{ $diagnostics['scheduler_enabled']?'alert-info':'alert-warning' }}"><strong>Meta CAPI worker: {{ $diagnostics['scheduler_enabled']?'Scheduler enabled':'Scheduler disabled' }}</strong><div>Last run: {{ !empty($diagnostics['last_worker']) ? \Carbon\Carbon::parse($diagnostics['last_worker'])->timezone('Asia/Dhaka')->format('d M Y, h:i:s A').' BDT' : 'Not run yet' }} · এটি worker চালুর সময়; Meta-তে event পৌঁছানোর প্রমাণ নয়।</div>@foreach($diagnostics['setup_blockers'] as $blocker)<div>• {{ $blocker }}</div>@endforeach<div>Test Events code থাকলে events test হিসেবে যাবে। Token saved মানেই connection OK নয়।</div></div>
+
+
+<div class="d-flex align-items-center justify-content-between mb-3"><h1 class="h4">Meta Pixel & Conversions API</h1><a class="btn btn-soft-primary" href="{{ route('platform.tracking') }}">All integrations</a></div>
+@if(session('platform_success'))<div class="alert alert-success">{{ session('platform_success') }}</div>@endif
+@if($errors->any())<div class="alert alert-danger">{{ $errors->first() }}</div>@endif
+<div class="row"><div class="col-md-4"><div class="card"><div class="card-body">Access token<br><strong>{{ $diagnostics['token_stored'] ? 'Encrypted token stored' : 'Not configured' }}</strong></div></div></div><div class="col-md-4"><div class="card"><div class="card-body">CAPI outbox<br><strong>{{ $diagnostics['pending'] }} pending · {{ $diagnostics['failed'] }} failed</strong></div></div></div><div class="col-md-4"><div class="card"><div class="card-body">Worker last ran (BDT)<br><strong>{{ $diagnostics['last_worker'] ?: 'Not run yet' }}</strong></div></div></div></div>
+@include('backend.platform.meta_activity')
+<form action="{{ route('platform.meta.save') }}" method="POST">@csrf
+<div class="card"><div class="card-body"><h2 class="h6">Pixel and delivery</h2>
+<label for="meta-id">Pixel / Dataset ID</label><input id="meta-id" class="form-control mb-3" name="id" value="{{ old('id',$options['id']) }}" maxlength="25">
+@foreach(['enabled'=>'Enable Meta tracking','browser'=>'Browser Pixel events','capi'=>'Server-side Conversions API','require_consent'=>'Ask visitors before Meta marketing cookies/events','advanced_matching'=>'Advanced matching: SHA-256 email, phone and external ID','exclude_admin'=>'Exclude admin/staff browsing','catalog_enabled'=>'Enable protected product catalog feed'] as $key=>$label)
+<label class="d-block"><input type="hidden" name="{{ $key }}" value="0"><input type="checkbox" name="{{ $key }}" value="1" {{ old($key,$options[$key]) ? 'checked' : '' }}> {{ $label }}</label>
+@endforeach
+<p class="text-muted">Browser and server events share the same event ID. Direct legacy Meta snippets are suppressed; remove duplicate Meta tags inside external GTM containers yourself. Purchase means a successfully placed COD order, not payment received.</p>
+<label for="cod-event">COD order confirmation event</label><select id="cod-event" name="cod_event" class="form-control mb-3">@foreach(['Purchase','Lead'] as $event)<option {{ old('cod_event',$options['cod_event'])===$event ? 'selected' : '' }}>{{ $event }}</option>@endforeach</select>
+</div></div>
+<div class="card"><div class="card-body"><h2 class="h6">Events</h2><div class="row">@foreach(\App\Services\MetaEventData::EVENTS as $event)<label class="col-md-4"><input type="hidden" name="events[{{ $event }}]" value="0"><input type="checkbox" name="events[{{ $event }}]" value="1" {{ old('events.'.$event,$options['events'][$event]??true) ? 'checked' : '' }}> {{ $event }}</label>@endforeach</div></div></div>
+<div class="card"><div class="card-body"><h2 class="h6">Conversions API credentials</h2>
+<p>Get an access token from Meta Events Manager → Dataset settings → Conversions API. Leave this field empty to retain the stored token.</p>
+<label for="capi-token">Access token</label><input id="capi-token" class="form-control mb-1" type="password" name="token" autocomplete="new-password" value="" placeholder="{{ $diagnostics['token_stored'] ? '••••••••••••••••' : 'No token stored' }}">
+<p class="small text-muted mb-3">{{ $diagnostics['token_stored'] ? '•••••••••••••••• — encrypted token stored. নতুন token লিখলে আগেরটি replace হবে; actual token কখনো page-এ দেখানো হবে না।' : 'কোনো access token stored নেই।' }}</p>
+<label><input type="checkbox" name="remove_token" value="1"> Remove stored token</label><br>
+<label for="meta-password">Admin password (required only for token changes)</label><input id="meta-password" class="form-control mb-3" type="password" name="password" autocomplete="current-password">
+<label for="graph-version">Graph API version</label><input id="graph-version" class="form-control mb-3" name="graph_version" value="{{ old('graph_version',$options['graph_version']) }}">
+<label for="meta-dispatch-limit">CAPI worker batch limit (1–100 events/minute, actual runtime bounded)</label><input id="meta-dispatch-limit" class="form-control mb-3" type="number" name="dispatch_limit" min="1" max="100" value="{{ $options['dispatch_limit'] ?? 10 }}"><p class="small text-muted">Default 10. বড় queue হলে hosting capacity অনুযায়ী বাড়ান। Cron বন্ধ থাকলে limit বাড়িয়েও event যাবে না।</p><label for="meta-test-code">Meta Test Events code (clear before production)</label><input id="meta-test-code" class="form-control mb-3" name="test_code" value="{{ old('test_code',$options['test_code']) }}" maxlength="100">
+<button class="btn btn-primary">Save Meta settings</button>
+</div></div></form>
+<div class="card"><div class="card-body"><h2 class="h6">Test and diagnostics</h2><p>Use Meta Pixel Helper / Events Manager to confirm real receipt. “Token stored” is not a connection test. Server-side delivery from localhost requires a Test Events code.</p>
+<form action="{{ route('platform.meta.test') }}" method="POST">@csrf<button class="btn btn-soft-primary">Queue PageView in Meta Test Events</button></form>
+<p class="mt-3">Worker: <code>php artisan meta:dispatch --limit=10</code>. Production cron must run <code>php artisan schedule:run</code> every minute. Checkout never waits for Meta.</p>
+<table class="table table-sm"><thead><tr><th>Event</th><th>State</th><th>HTTP / code</th><th>বাংলাদেশ সময় (BDT)</th><th></th></tr></thead><tbody>@forelse($diagnostics['recent'] as $receipt)<tr><td>{{ $receipt['event'] }}</td><td>{{ $receipt['state'] }}</td><td>{{ $receipt['http_status'] }} / {{ $receipt['error_code'] }}</td><td>{{ \Carbon\Carbon::parse($receipt['at'])->timezone('Asia/Dhaka')->format('d M Y, h:i:s A') }}</td><td>@if(in_array($receipt['state'],['failed','local_blocked'],true))<form action="{{ route('platform.meta.retry') }}" method="POST">@csrf<input type="hidden" name="key" value="{{ $receipt['key'] }}"><button class="btn btn-sm btn-light">Retry</button></form>@endif</td></tr>@empty<tr><td colspan="5">No server delivery attempts yet.</td></tr>@endforelse</tbody></table>
+</div></div>
+<div class="card"><div class="card-body"><h2 class="h6">Catalog / dynamic ads</h2><p>Feed product IDs match event content_ids. Add the protected feed URL to Meta Commerce Manager; items include availability, price, image and product link. The feed does not create an ad account or campaign.</p>@if($catalogUrl)<label>Private feed URL</label><input class="form-control" readonly value="{{ $catalogUrl }}">@else<p class="text-muted">Enable the catalog feed and save to generate its private URL.</p>@endif</div></div>
+@endsection

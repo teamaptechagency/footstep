@@ -1,0 +1,6 @@
+@extends('backend.layouts.app')
+@section('content')
+<div class="ui-inbox">@include('backend.inbox.tabs')
+<header class="ui-heading"><div><small>INBOX / CUSTOMER CONVERSATIONS</small><h1>Customer Inbox</h1><p>Messenger, WhatsApp ও Website Chat—এক জায়গা থেকে দেখুন।</p></div></header>
+<div class="ui-onboarding"><div class="ui-onboarding-art"><i class="las la-comments" aria-hidden="true"></i></div><span class="ui-eyebrow">READY WHEN YOU ARE</span><h2>Connect your conversations.</h2><p>এখনো কোনো live Facebook Page বা WhatsApp number connect করা নেই।<br>Connections সেট করলে customer messages এখানে দেখাবে।</p><div class="ui-onboarding-actions">@if(auth()->user()->user_type==='admin')<a class="btn btn-primary" href="{{ route('inbox.settings') }}">Connect Page / number <i class="las la-arrow-right"></i></a>@endif @if(\App\Services\WebsiteLiveChat::admin(auth()->user()))<a class="btn btn-light" href="{{ route('inbox.index',['source'=>'website']) }}">Open Website Chat</a>@endif</div><div class="ui-blank-features"><span><i class="lab la-facebook-messenger"></i> Messenger</span><span><i class="lab la-whatsapp"></i> WhatsApp</span><span><i class="las la-comment"></i> Website</span></div><small class="ui-onboarding-note">Credentials manage করুন Integrations → Inbox Connections &amp; Settings থেকে।</small></div></div>
+@endsection

@@ -1,0 +1,8 @@
+import data from './original-design.json';
+import {browserOrigin} from './catalog';
+export const design=data as typeof data & {productRoutes:Record<string,number>;dealRoutes:Record<string,number>;about:string};
+export function productHref(id:number,current?:string){if(current){if(!current.includes('/'))return `/product/${encodeURIComponent(current)}`;try{const u=new URL(current,'https://footsteponline.com');if(/^\/product\/[^/]+$/.test(u.pathname))return u.pathname;}catch{}}const entry=Object.entries(design.productRoutes).find(([,value])=>value===id);return `/product/${entry?entry[0]:id}`;}
+export function dealHref(id:number,slug?:string){if(slug)return `/flash-deal/${encodeURIComponent(slug)}`;const entry=Object.entries(design.dealRoutes).find(([,value])=>value===id);return `/flash-deal/${entry?entry[0]:id}`;}
+export function legacyHref(value:string){try{const u=new URL(value,'https://footsteponline.com');if(!['http:','https:'].includes(u.protocol))return '#';if(['footsteponline.com','www.footsteponline.com','127.0.0.1'].includes(u.hostname)){if(u.pathname==='/')return '/';if(u.pathname==='/search')return '/shop';if(u.pathname==='/categories')return '/categories';if(u.pathname==='/flash-deals')return '/flash-deals';if(u.pathname.startsWith('/product/')||u.pathname.startsWith('/flash-deal/'))return u.pathname+u.search;return browserOrigin+u.pathname+u.search;}return u.href;}catch{return '#';}}
+export function resolveProductKey(key:string){if(/^\d+$/.test(key))return Number(key);return design.productRoutes[key]||null;}
+export function resolveDealKey(key:string){if(/^\d+$/.test(key))return Number(key);return design.dealRoutes[key]||null;}

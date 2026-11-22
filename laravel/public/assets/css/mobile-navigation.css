@@ -1,0 +1,5 @@
+/* Shared navigation policy for Classic, Premium and Studio. */
+@media(max-width:1199.98px){header .footstep-header-menu,header .studio-links,header .category-menu-icon-box,header #hover-category-menu{display:none!important}}
+body[data-flash-order="true"] .aiz-mobile-bottom-nav,body[data-flash-order="true"] .footer-widget,body[data-flash-order="true"] footer.bg-black{display:none!important}
+body[data-flash-order="true"] .aiz-main-wrapper{padding-bottom:90px}
+body[data-flash-order="true"] .footstep-sticky-order{bottom:0}

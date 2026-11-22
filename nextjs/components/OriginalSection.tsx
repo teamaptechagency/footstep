@@ -1,0 +1,5 @@
+import Link from 'next/link';
+import {Product} from '@/lib/catalog';
+import {ProductCard,ProductGrid} from './Catalog';
+import OriginalCarousel from './OriginalCarousel';
+export default function OriginalSection({title,items,href,carousel=false,autoSlide=false,intervalSeconds=5}:{title:string;items:Product[];href?:string;carousel?:boolean;autoSlide?:boolean;intervalSeconds?:number}){return <section className="mb-4"><div className="container"><div className="px-2 py-4 px-md-4 py-md-3 bg-white shadow-sm rounded"><div className="d-flex mb-3 align-items-baseline border-bottom"><h3 className="h5 fw-700 mb-0"><span className="border-bottom border-primary border-width-2 pb-3 d-inline-block">{title}</span></h3>{href&&<Link href={href} className="ml-auto mr-0 btn btn-primary btn-sm shadow-md">View More</Link>}</div>{carousel?<OriginalCarousel autoSlide={autoSlide} intervalSeconds={intervalSeconds}>{items.map(p=><ProductCard key={p.id} product={p}/>)}</OriginalCarousel>:<ProductGrid items={items}/>}</div></div></section>;}

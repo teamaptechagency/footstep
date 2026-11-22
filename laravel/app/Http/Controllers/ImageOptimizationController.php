@@ -1,0 +1,24 @@
+<?php
+namespace App\Http\Controllers;
+use Illuminate\Http\Request;
+use App\Models\{Upload,Product,BusinessSetting};
+use App\Services\{OptimizedImages,ImageOptimizationPanel as Panel};
+use Illuminate\Support\Facades\Cache;
+class ImageOptimizationController extends Controller {
+ private function admin(){abort_unless(auth()->check()&&auth()->user()->user_type==='admin',403);}
+ private function images(){return Upload::where('type','image')->whereIn('extension',['jpg','jpeg','png','webp','bmp','avif']);}
+ public function index(){$this->admin();return view('backend.platform.image_optimization',['count'=>$this->images()->count(),'automatic'=>Panel::automatic(),'webp'=>function_exists('imagewebp')]);}
+ public function resizer(){$this->admin();return view('backend.platform.image_tools',['tool'=>'resize']);}
+ public function square(){$this->admin();return view('backend.platform.image_tools',['tool'=>'square']);}
+ public function enhancer(){$this->admin();return view('backend.platform.image_tools',['tool'=>'enhance']);}
+ public function resize(Request $r){$this->admin();$d=$r->validate(['product_id'=>'required|integer','upload_id'=>'required|integer','method'=>'required|in:scale,custom','factor'=>'required_if:method,scale|nullable|integer|in:1,2,3','width'=>'required_if:method,custom|nullable|integer|min:16|max:4096','height'=>'required_if:method,custom|nullable|integer|min:16|max:4096']);return response()->json(\App\Services\ProductImageVersions::resize($d));}
+ public function settings(Request $r){$this->admin();$r->validate(['automatic'=>'required|boolean']);$row=BusinessSetting::where('type',Panel::KEY)->first()?:new BusinessSetting();$row->type=Panel::KEY;$row->value=$r->boolean('automatic')?'1':'0';$row->save();Cache::forget(Panel::KEY);return response()->json(['automatic'=>Panel::automatic()]);}
+ public function records(Request $r){$this->admin();$r->validate(['page'=>'nullable|integer|min:1','search'=>'nullable|string|max:100']);$q=$this->images();if($r->filled('search'))$q->where(function($q)use($r){$term=str_replace(['%','_'],['\\%','\\_'],$r->search);$q->where('file_original_name','like','%'.$term.'%')->orWhere('id',ctype_digit($r->search)?(int)$r->search:0);});$rows=$q->orderByDesc('id')->paginate(15);return response()->json(['rows'=>collect($rows->items())->map(fn($u)=>Panel::detail($u)),'page'=>$rows->currentPage(),'last_page'=>$rows->lastPage(),'total'=>$rows->total()]);}
+ public function optimize($id){$this->admin();$u=$this->images()->findOrFail($id);OptimizedImages::buildUpload($u->id,null,'manual');return response()->json(Panel::detail($u));}
+ public function batch(Request $r){$this->admin();$d=$r->validate(['cursor'=>'required|integer|min:0']);$rows=$this->images()->where('id','>',$d['cursor'])->orderBy('id')->limit(6)->get();$details=[];foreach($rows as $row){OptimizedImages::buildUpload($row->id,null,'manual');$details[]=Panel::detail($row);}$cursor=$rows->isEmpty()?$d['cursor']:$rows->last()->id;return response()->json(['cursor'=>$cursor,'processed'=>$this->images()->where('id','<=',$cursor)->count(),'total'=>$this->images()->count(),'done'=>!$this->images()->where('id','>',$cursor)->exists(),'rows'=>$details]);}
+ public function check(Request $r){$this->admin();$d=$r->validate(['cursor'=>'required|integer|min:0']);$q=Product::whereNotNull('thumbnail_img')->where('thumbnail_img','!=','');$rows=(clone $q)->where('id','>',$d['cursor'])->orderBy('id')->limit(40)->get(['id','name','thumbnail_img']);$bad=[];foreach($rows as $p){$row=Panel::thumbnail($p);if($r->boolean('all')||$row['status']!=='valid')$bad[]=$row;}$cursor=$rows->isEmpty()?$d['cursor']:$rows->last()->id;return response()->json(['cursor'=>$cursor,'checked'=>(clone $q)->where('id','<=',$cursor)->count(),'total'=>$q->count(),'done'=>!(clone $q)->where('id','>',$cursor)->exists(),'rows'=>$bad]);}
+ public function versions(Request $r){$this->admin();$d=$r->validate(['product_id'=>'required|integer']);return response()->json(\App\Services\ProductImageVersions::listing($d['product_id']));}
+ public function enhance(Request $r){$this->admin();$d=$r->validate(['product_id'=>'required|integer','upload_id'=>'required|integer','sharpness'=>'required|integer|min:0|max:20','brightness'=>'required|integer|min:-10|max:10','contrast'=>'required|integer|min:-10|max:10']);return response()->json(\App\Services\ProductImageVersions::enhance($d));}
+ public function choose(Request $r){$this->admin();$d=$r->validate(['product_id'=>'required|integer','upload_id'=>'required|integer','expected'=>'required|integer']);return response()->json(\App\Services\ProductImageVersions::choose($d['product_id'],$d['upload_id'],$d['expected']));}
+ public function convert(Request $r){$this->admin();$d=$r->validate(['product_id'=>'required|integer','upload_id'=>'required|integer']);return response()->json(\App\Services\ProductImageVersions::convert($d['product_id'],$d['upload_id'],$r->input('size','square')));}
+}

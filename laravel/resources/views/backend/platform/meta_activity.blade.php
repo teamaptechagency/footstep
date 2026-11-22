@@ -1,0 +1,10 @@
+<section class="card" id="integration-meta-health" data-url="{{ route('integration-health.meta') }}" data-test="{{ route('integration-health.meta-test') }}" data-token="{{ csrf_token() }}"><div class="card-body">
+<div class="d-flex justify-content-between flex-wrap"><h2 class="h5">Delivery health / Meta-তে কী যাচ্ছে</h2><button type="button" class="btn btn-light" data-refresh>Refresh report</button></div>
+<p>Token stored মানে credential সংরক্ষিত—connection সফল, এমন নয়। Pending মানে server event পাঠানোর অপেক্ষায়; Failed মানে পাঠানোর চেষ্টা ব্যর্থ হয়েছে। Browser Pixel ও server CAPI আলাদা।</p>
+<div class="alert alert-light border" data-health-status role="status">Report load হচ্ছে…</div>
+<button type="button" class="btn btn-outline-primary" data-test-button>Test CAPI connection · synthetic PageView</button><p class="small mt-2">আগে নিচে Meta Test Events code save করুন। এই button শুধু একটি test PageView পাঠাবে; পুরোনো outbox, Purchase বা customer তথ্য পাঠাবে না। Test গ্রহণ হলেই production delivery/ads attribution নিশ্চিত নয়।</p>
+<div class="table-responsive"><table class="table table-sm"><thead><tr><th>Dhaka date</th><th>Queued</th><th>API attempts</th><th>Accepted</th><th>Failed</th><th>Retry</th><th>Discarded / blocked</th><th>Test accepted</th></tr></thead><tbody data-daily></tbody></table></div>
+<details><summary>Today event breakdown / আজ কোন event</summary><div data-events></div></details>
+<p class="small text-muted">Daily counters এই update থেকে শুরু; আগের দিনের পূর্ণ হিসাব বানানো হবে না। Accepted = Meta API request গ্রহণ করেছে। Browser Pixel পৌঁছেছে কি না Meta Pixel Helper / Events Manager → Test Events থেকে দেখুন।</p>
+<p><strong>Cron দরকার:</strong> cPanel → Cron Jobs, প্রতি মিনিটে <code>/usr/local/bin/php /home/footstep/public_html/artisan schedule:run &gt;&gt; /home/footstep/scheduler.log 2&gt;&amp;1</code>। Hosting-এর PHP/path আলাদা হলে সঠিক path দিন। Existing scheduler cron থাকলে duplicate করবেন না। Backup worker cron আলাদা।</p>
+</div></section><script src="{{ static_asset('assets/js/integration-health.js') }}?v=2.4.25" defer></script>

@@ -1,0 +1,14 @@
+<?php
+namespace App\Http\Controllers;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use App\Services\{AdminOrderEntry,OnePageCheckout,BackendModules};
+class AdminOrderEntryController extends Controller {
+ private function admin(){abort_unless(auth()->check()&&auth()->user()->user_type==='admin'&&!auth()->user()->banned,403);abort_unless(BackendModules::enabled('sales.orders'),403);}
+ public function index(Request $r){$this->admin();$token=bin2hex(random_bytes(16));$r->session()->put('admin_order_entry.'.$token,['expires'=>time()+3600]);return response()->view('backend.sales.manual_order',compact('token'))->header('Cache-Control','private, no-store');}
+ public function products(Request $r){$this->admin();$d=$r->validate(['q'=>'nullable|string|max:100']);$q=\App\Models\Product::with('stocks','taxes')->where('published',1)->where('digital',0)->where(function($q){$q->whereNull('external_link')->orWhere('external_link','');});if(!empty($d['q']))$q->where('name','like','%'.addcslashes($d['q'],'%_').'%');
+ return response()->json(['products'=>$q->latest('id')->limit(20)->get()->map(function($p){return ['id'=>$p->id,'name'=>$p->name,'image'=>\App\Services\InvoiceImages::source($p),'stocks'=>$p->stocks->map(function($s)use($p){$q=\App\Services\Checkout\ProductQuote::selection($p,$s,1);return ['id'=>$s->id,'size'=>$s->variant?:'Standard','available'=>(int)$s->qty,'price'=>round($q['price']+$q['tax'],2)];})];})])->header('Cache-Control','private, no-store');}
+ public function store(Request $r){$this->admin();$r->merge(['phone'=>OnePageCheckout::phone($r->input('phone',''))]);$d=$r->validate(['entry_token'=>'required|string|size:32','name'=>'required|string|max:191','phone'=>'required|regex:/^01[3-9][0-9]{8}$/D','email'=>'nullable|email|max:191','address'=>'required|string|max:255','city'=>'required|in:In Dhaka City,Out Of Dhaka City','items'=>'required|array|min:1|max:20','items.*.stock_id'=>'required|integer|distinct','items.*.quantity'=>'required|integer|min:1|max:99']);$key='admin_order_entry.'.$d['entry_token'];$state=$r->session()->get($key);abort_unless($state,419,'Reload the order form.');if(isset($state['order_id']))return redirect()->route('store-ops.invoice',$state['order_id']);abort_if($state['expires']<time(),419,'Order form expired. Reload it.');
+ return Cache::lock('admin-order-entry:'.auth()->id().':'.$d['entry_token'],30)->block(5,function()use($r,$d,$key){$saved=\App\Services\StoreOperations::get('admin_entry_'.hash('sha256',$d['entry_token']));$cached=($saved['admin_id']??null)===auth()->id()?($saved['order_id']??null):null;if($cached)return redirect()->route('store-ops.invoice',$cached);$o=AdminOrderEntry::create($d);Cache::put('admin-order-result:'.$d['entry_token'],$o->id,3600);$r->session()->put($key,['order_id'=>$o->id]);return redirect()->route('store-ops.invoice',$o->id)->with('success','Order created. Review/edit invoice before sending to courier.');});
+ }
+}

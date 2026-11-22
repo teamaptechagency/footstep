@@ -1,0 +1,13 @@
+import Link from 'next/link';
+import {browserOrigin,image} from '@/lib/catalog';
+import {design} from '@/lib/design';
+export default function Footer(){const phone=design.contactPhone.replace(/[^0-9]/g,'');return <>
+<section className="footer-widget py-4" style={{background:"#eef8f3",borderTop:"1px solid #d4e9dd",color:"#173e38"}}><div className="container"><h2 className="h6 fw-700 mb-2">Return & Exchange / রিটার্ন ও এক্সচেঞ্জ</h2><p className="mb-2" style={{lineHeight:1.8}}>Brand ও model অনুযায়ী size ও fit আলাদা হতে পারে। সাইজ নিয়ে সাহায্য নিন; সমস্যা হলে আমাদের জানান—এক দিনের মধ্যে exchange-এর ব্যবস্থা শুরু করব।</p><a href="/returnpolicy" style={{fontWeight:700,color:"#087b52"}}>সম্পূর্ণ Return & Exchange Policy দেখুন →</a></div></section>
+
+ <section className="bg-dark text-light footer-widget footstep-footer-main"><div className="container"><div className="row align-items-start">
+ <div className="col-md-4 footstep-footer-brand"><Link href="/"><img src={image(design.footerLogo||design.logo||'')} alt="Footstep online" height="82"/></Link>{design.about&&<div className="mt-3">{design.about}</div>}</div>
+ <div className="col-12 col-md-2 footstep-footer-contact"><h4 className="footstep-footer-heading">Contact Info</h4>{phone&&<a className="footstep-footer-whatsapp" href={`https://wa.me/${phone}`} aria-label="Contact WhatsApp" target="_blank" rel="noopener noreferrer"><i className="lab la-whatsapp"/></a>}</div>
+ <div className="col-6 col-md-3"><h4 className="footstep-footer-heading">Social Links</h4><ul className="footstep-footer-social">{design.facebook&&<li><a className="facebook" href={design.facebook} aria-label="Facebook" target="_blank" rel="noopener noreferrer"><i className="lab la-facebook-f"/></a></li>}{design.instagram&&<li><a className="instagram" href={design.instagram} aria-label="Instagram" target="_blank" rel="noopener noreferrer"><i className="lab la-instagram"/></a></li>}</ul><Link href="/size-guide" className="footer-size-guide">Size Guide / সাইজ গাইড ↗</Link></div>
+ <div className="col-6 col-md-3 footstep-footer-account"><h4 className="footstep-footer-heading">My Account</h4><ul className="list-unstyled mb-0">{[['Login','/users/login'],['Order History','/purchase_history'],['My Wishlist','/wishlists'],['Track Order','/track-your-order']].map(([text,url])=><li className="mb-2" key={text}><a className="opacity-50 text-reset" href={browserOrigin+url}>{text}</a></li>)}</ul></div>
+ </div></div></section><footer className="pt-3 pb-7 pb-xl-3 bg-black text-light"><div className="container footstep-footer-copyright">{design.copyright.trim()}</div></footer>
+ </>;}

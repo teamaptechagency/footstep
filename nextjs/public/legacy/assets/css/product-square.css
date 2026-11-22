@@ -1,0 +1,12 @@
+.aiz-card-box img.img-fit,.bazar-product-media img,.studio-product-media img{width:100%!important;height:auto!important;aspect-ratio:1/1;object-fit:cover!important}.product-gallery .carousel-box>img{width:100%!important;height:auto!important;aspect-ratio:1/1;object-fit:contain!important;background:#fff}.product-gallery-thumb img,.checkout-item img,.footstep-direct-product img{aspect-ratio:1/1;object-fit:cover}.checkout-item img{width:64px;height:64px;flex:none}
+
+/* Product card thumbnails: 450 x 600, portrait 3:4. */
+body .aiz-card-box img.img-fit,body .bazar-product:not(.bazar-horizontal-product) .bazar-product-media img,body .studio-product-media img{width:100%!important;height:auto!important;aspect-ratio:3/4!important;object-fit:cover!important;object-position:center}
+body .bazar-product:not(.bazar-horizontal-product) .bazar-product-media>a,body .studio-product-media>a{aspect-ratio:3/4!important;display:block;overflow:hidden}
+
+/* Public product thumbnails fill their 450:600 media card without letterboxing. */
+body .aiz-card-box>.position-relative>a:first-child,body .bazar-product:not(.bazar-horizontal-product) .bazar-product-media>a,body .studio-product-media>a,body .fsale-card-image{display:block!important;aspect-ratio:3/4!important;overflow:hidden;padding:0!important}
+body .aiz-card-box>.position-relative>a:first-child>img.img-fit,body .bazar-product:not(.bazar-horizontal-product) .bazar-product-media>a>img,body .studio-product-media>a>img,body .fsale-card-image>img{display:block!important;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:cover!important;object-position:center!important;margin:0!important;padding:0!important}
+
+/* Main product gallery fills its frame on all layouts and screen sizes. */
+body .product-gallery .carousel-box{aspect-ratio:3/4!important;overflow:hidden;position:relative}body .product-gallery .carousel-box>img{display:block!important;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;aspect-ratio:auto!important;object-fit:cover!important;object-position:center!important;margin:0!important;padding:0!important}body .product-gallery .slick-list{height:auto!important}

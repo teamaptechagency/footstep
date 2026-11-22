@@ -1,0 +1,91 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next-meta-audit/types/**/*.ts",
+    ".next-meta-audit/dev/types/**/*.ts",
+    ".next-speed-20261111/types/**/*.ts",
+    ".next-speed-20261111/dev/types/**/*.ts",
+    ".next-meta-consent-20261111/types/**/*.ts",
+    ".next-meta-consent-20261111/dev/types/**/*.ts",
+    ".next-cookie-prompt-20261111/types/**/*.ts",
+    ".next-cookie-prompt-20261111/dev/types/**/*.ts",
+    ".next-order-popup-20261111/types/**/*.ts",
+    ".next-order-popup-20261111/dev/types/**/*.ts",
+    ".next-order-close-20261111/types/**/*.ts",
+    ".next-order-close-20261111/dev/types/**/*.ts",
+    ".next-no-cookie-prompt-20261112/types/**/*.ts",
+    ".next-no-cookie-prompt-20261112/dev/types/**/*.ts",
+    ".next-flash-label-20261112/types/**/*.ts",
+    ".next-flash-label-20261112/dev/types/**/*.ts",
+    ".next-flash-label-env-20261112/types/**/*.ts",
+    ".next-flash-label-env-20261112/dev/types/**/*.ts",
+    ".next-seo-20261114/types/**/*.ts",
+    ".next-seo-20261114/dev/types/**/*.ts",
+    ".next-seo-20261114-final/types/**/*.ts",
+    ".next-seo-20261114-final/dev/types/**/*.ts",
+    ".next-seo-release-20261114/types/**/*.ts",
+    ".next-seo-release-20261114/dev/types/**/*.ts",
+    ".next-seo-live-20261114/types/**/*.ts",
+    ".next-seo-live-20261114/dev/types/**/*.ts",
+    ".next-return-policy-20261114/types/**/*.ts",
+    ".next-return-policy-20261114/dev/types/**/*.ts",
+    ".next-migration-20261114/types/**/*.ts",
+    ".next-migration-20261114/dev/types/**/*.ts",
+    ".next-checkout-fast-20261116/types/**/*.ts",
+    ".next-checkout-fast-20261116/dev/types/**/*.ts",
+    ".next-checkout-preload-20261116/types/**/*.ts",
+    ".next-checkout-preload-20261116/dev/types/**/*.ts",
+    ".next-checkout-preload-final-20261116/types/**/*.ts",
+    ".next-checkout-preload-final-20261116/dev/types/**/*.ts",
+    ".next-checkout-preload-share-20261116/types/**/*.ts",
+    ".next-checkout-preload-share-20261116/dev/types/**/*.ts",
+    ".next-product-prefetch-20261116/types/**/*.ts",
+    ".next-product-prefetch-20261116/dev/types/**/*.ts",
+    ".next-product-prefetch-full-20261116/types/**/*.ts",
+    ".next-product-prefetch-full-20261116/dev/types/**/*.ts",
+    ".next-product-prefetch-layout-20261116/types/**/*.ts",
+    ".next-product-prefetch-layout-20261116/dev/types/**/*.ts",
+    ".next-intl-settings-20261121/types/**/*.ts",
+    ".next-intl-settings-20261121/dev/types/**/*.ts",
+    ".next-footsteponline-20261121/types/**/*.ts",
+    ".next-footsteponline-20261121/dev/types/**/*.ts",
+    ".next-main-domain-fix-20261121/types/**/*.ts",
+    ".next-main-domain-fix-20261121/dev/types/**/*.ts",
+    ".next-hourly-images-20261121/types/**/*.ts",
+    ".next-hourly-images-20261121/dev/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

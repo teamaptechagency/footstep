@@ -1,0 +1,1 @@
+export default function Loading(){return <div className="container section" aria-live="polite"><p>Loading collection…</p><div className="product-grid">{Array.from({length:10},(_,i)=><div key={i} className="skeleton"/>)}</div></div>;}

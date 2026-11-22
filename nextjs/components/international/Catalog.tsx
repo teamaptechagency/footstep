@@ -1,0 +1,6 @@
+import Link from 'next/link';
+import {Product,image} from '@/lib/catalog';
+import {productHref} from '@/lib/design';
+import OrderButton from '@/components/OrderButton';
+export function InternationalCard({product:p}:{product:Product}){const href=productHref(p.id,p.slug||p.link);return <article className="product-card"><div className="product-image"><Link href={href} prefetch={false} aria-label={p.name}><img src={image(p.thumbnail_image)} alt={p.name} width="600" height="800" loading="lazy"/></Link>{p.has_discount&&<span className="product-badge">On sale</span>}<OrderButton id={p.id} className="quick-add">Order now</OrderButton></div><div className="product-info"><div className="product-brand">{p.brand?.name||'Footstep collection'}</div><Link className="product-name" href={href} prefetch={false}>{p.name}</Link><div className="product-info-bottom"><span className="product-price">{p.main_price}</span>{p.has_discount&&<del className="old-price">{p.stroked_price}</del>}</div></div></article>}
+export function InternationalGrid({items}:{items:Product[]}){return items.length?<div className="product-grid">{items.map(p=><InternationalCard key={p.id} product={p}/>)}</div>:<div className="fs-intl-empty"><h2>No matching shoes yet.</h2><p>Try another brand, style or category.</p><Link href="/shop">Explore all shoes</Link></div>}

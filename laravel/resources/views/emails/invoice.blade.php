@@ -1,0 +1,1 @@
+<!doctype html><html><head><meta charset="utf-8"></head><body style="font:14px Arial,sans-serif;color:#18372e">@include('frontend.partials.order_invoice_document')</body></html>

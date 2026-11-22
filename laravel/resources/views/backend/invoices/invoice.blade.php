@@ -1,0 +1,1 @@
+<!doctype html><html><head><meta charset="utf-8"><style>body{font-family: sans-serif;font-size:12px;color:#18372e}table{width:100%}th,td{padding:8px;border-bottom:1px solid #ddd}</style></head><body>@include('frontend.partials.order_invoice_document',['invoicePdf'=>true])</body></html>
